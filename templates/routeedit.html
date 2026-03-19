@@ -94,6 +94,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
+
     </style>
 </head>
 <body>
@@ -125,11 +126,79 @@
     </nav>
 
     <main class="main-content">
-        
-        <div class="card">
-            <h2>Welcome to TFMS</h2>
-            <p>Select an option from the sidebar to manage your factory data.</p>
-        </div>
+
+        <h2>Route Entry</h2>
+        <hr>
+        <form method="POST", id="RouteF", action="{{ url_for('route.routeEdit',id=id) }}">
+
+            <label>Created Date: </label>
+            <input value="{{s[0]}}" readonly><br><br>
+
+            <label>Created By: </label>
+            <input value="{{s[1]}}" readonly><br><br>
+
+            <label>Is Active: </label>
+            <input name="active" type="checkbox" {% if s[10] %}checked{% endif %}><br><br>
+
+            <label>Company Id: </label>
+            <input name="CompanyId" value="{{s[2]}}" type="number" required><br><br>
+
+            <label>Route Code: </label>
+            <input name="RouteCode" maxlength="5" value="{{s[3]}}" type="text" required><br><br>
+
+            <label>Route Name: </label>
+            <input name="RouteName" value="{{s[4]}}" type="text" required><br><br>
+
+            <label>Last sup number: </label>
+            <input name="LastSupNo" value="{{s[5]}}" type="number"><br><br>
+
+            <label>Route Order: </label>
+            <input name="RouteOrder" value="{{s[6]}}" type="number"><br><br>
+
+            <label>Route Device No: </label>
+            <input name="RouteDeviceNo" value="{{s[7]}}" maxlength="10" type="text"><br><br>
+
+            <label>GPS Location: </label>
+            <input name="GPSLocation" type="text" value="{{s[8]}}"><br><br>
+
+            <label>Status: </label>
+            <input name="Status" maxlength="10" value="{{s[9]}}" type="text" required><br><br>
+
+            <label>Router Manager Id: </label>
+            <input name="RouteManagerId" type="number" value="{{s[11]}}"><br><br>
+
+            <label>Consolidation Id: </label>
+            <input name="ConsolidationId" type="number" value="{{s[12]}}"><br><br>
+
+            <label>Transport Id: </label>
+            <input name="TransportId" type="number" value="{{s[13]}}" required><br><br>
+
+            <label>Category 01</label>
+            <input type="text" name="category_01" maxlength="10" value="{{s[14]}}" ><br><br>
+
+            <label>Category 02</label>
+            <input type="text" name="category_02" maxlength="10" value="{{s[15]}}"><br><br>
+
+            <label>Category 03</label>
+            <input type="text" name="category_03" maxlength="10"  value="{{s[16]}}"><br><br>
+
+            <label>Category 04</label>
+            <input type="text" name="category_04" maxlength="10" value="{{s[17]}}"><br><br>
+
+            <label>Category 05</label>
+            <input type="text" name="category_05" maxlength="10" value="{{s[18]}}"><br><br>
+
+            <button type="submit">Save Route</button>
+    
+        </form>
+        <script>
+        document.getElementById("RouteF").addEventListener("submit", function(event) {
+            if (!confirm("Are you sure you want to submit this form?")) {
+                event.preventDefault();
+            }
+        });
+        </script>
+
     </main>
 
 </body>

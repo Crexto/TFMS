@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFMS - Master</title>
+    <style>
+        :root {
+            --primary-bg: #2c3e50;
+            --accent-color: #3498db;
+            --text-light: #ecf0f1;
+            --sidebar-width: 250px;
+            --success-green: #27ae60;
+            --error-red: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: #f4f7f6;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-bg);
+            height: 100vh;
+            color: var(--text-light);
+            position: fixed;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            background: #1a252f;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item-header {
+            padding: 15px 25px;
+            background: #34495e;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #95a5a6;
+        }
+
+        .submenu {
+            list-style: none;
+            padding: 1;
+        }
+
+        .submenu-item a {
+            display: block;
+            padding: 12px 25px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .submenu-item a:hover {
+            background: #3e5871;
+            border-left: 4px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            color: white;
+        }
+        .alert-success { background-color: var(--success-green); }
+        .alert-danger { background-color: var(--error-red); }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">TFMS Admin</div>
+        <ul class="nav-menu">
+            <li class="nav-item-header">Logged in as Crex</li>
+            <li class="submenu-item">
+                <a href="{{ url_for('main') }}">Dashboard</a>
+            </li>
+
+            <li class="submenu-item">
+                <a href="{{ url_for('supplier.supplier',type='') }}"><strong>Supplier Master</strong></a>
+                <ul class="submenu">
+                    <li class="submenu-item"><a href="{{ url_for('supplier.supplier',type='add') }}">Add New Supplier</a></li>
+                    <li class="submenu-item"><a href="{{ url_for('supplier.supplier',type='manage') }}">Update/View All</a></li>
+                </ul>
+            </li>
+
+            <li class="submenu-item">
+                <a href="{{ url_for('route.route',type='') }}"><strong>Route Master</strong></a>
+                <ul class="submenu">
+                    <li class="submenu-item"><a href="{{ url_for('route.route',type='add') }}">Add New Route</a></li>
+                    <li class="submenu-item"><a href="{{ url_for('route.route',type='manage') }}">Update/View All</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% if type == "manage" %}
+
+            <div id="manage-form" class="card">
+                <h2>Route Master</h2>
+                <hr>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead>
+                        <tr style="background-color: #f2f2f2; text-align: left;">
+                            <th style="padding: 10px;">ID</th>
+                            <th>Route Code</th>
+                            <th>Route Name</th>
+                            <th>Is Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for x in data %}
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <td style="padding: 10px;">#{{x[0]}}</td>
+                            <td>{{x[1]}}</td>
+                            <td>{{x[2]}}</td>
+                            <td>{{x[3]}}</td>
+                            <td>
+                                <a href="/route/{{x[0]}}">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% elif type == 'add' %}
+            <div id="add-form" class="card">
+                <h2>Route Entry</h2>
+                <hr>
+                <form id="RouteF" method="POST" action="{{ url_for('route.routeAdd') }}">
+
+                    <label>Company Id: </label>
+                    <input name="CompanyId" type="number" required><br><br>
+
+                    <label>Route Code: </label>
+                    <input name="RouteCode" maxlength="5" type="text" required><br><br>
+
+                    <label>Route Name: </label>
+                    <input name="RouteName" type="text"><br><br>
+
+                    <label>Is Active: </label>
+                    <input name="active" type="checkbox" checked><br><br>
+
+                    <label>Last sup number: </label>
+                    <input name="LastSupNo" type="number" required><br><br>
+
+                    <label>Route Order: </label>
+                    <input name="RouteOrder" type="number" required><br><br>
+
+                    <label>Route Device No: </label>
+                    <input name="RouteDeviceNo" maxlength="10" type="text"><br><br>
+
+                    <label>GPS Location: </label>
+                    <input name="GPSLocation" type="text" required><br><br>
+
+                    <label>Status: </label>
+                    <input name="Status" maxlength="10" type="text" required><br><br>
+
+                    <label>Router Manager Id: </label>
+                    <input name="RouteManagerId" type="number"><br><br>
+
+                    <label>Consolidation Id: </label>
+                    <input name="ConsolidationId" type="number"><br><br>
+
+                    <label>Transport Id: </label>
+                    <input name="TransportId" type="number" required><br><br>
+
+                    <label>Category 01</label>
+                    <input type="text" name="category_01" maxlength="10" ><br><br>
+
+                    <label>Category 02</label>
+                    <input type="text" name="category_02" maxlength="10" ><br><br>
+
+                    <label>Category 03</label>
+                    <input type="text" name="category_03" maxlength="10"  ><br><br>
+
+                    <label>Category 04</label>
+                    <input type="text" name="category_04" maxlength="10" ><br><br>
+
+                    <label>Category 05</label>
+                    <input type="text" name="category_05" maxlength="10" ><br><br>
+
+                    <button type="submit">Submit</button>
+            
+                </form>
+                <script>
+                document.getElementById("RouteF").addEventListener("submit", function(event) {
+                    if (!confirm("Are you sure you want to submit this form?")) {
+                        event.preventDefault();
+                    }
+                });
+                </script>
+            </div>
+        {% else %}
+            <div class="card" class="card">
+                <h2>Route Master</h2>
+                <p>Select an option from navigation bar</p>
+                <hr>
+            </div>
+        {% endif %}
+
+    </main>
+
+</body>
+</html>
