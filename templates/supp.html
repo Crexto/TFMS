@@ -103,7 +103,7 @@
     <nav class="sidebar">
         <div class="sidebar-header">TFMS Admin</div>
         <ul class="nav-menu">
-            <li class="nav-item-header">Logged in as Crex</li>
+            <li class="nav-item-header">Logged in as User 03</li>
             <li class="submenu-item">
                 <a href="{{ url_for('main') }}">Dashboard</a>
             </li>
@@ -161,7 +161,7 @@
                             <td>{{x[2]}}</td>
                             <td>{{x[3]}}</td>
                             <td>
-                                <a href="/supplier/{{x[0]}}">Edit</a>
+                                <a href="/supplier/edit/{{x[0]}}">Edit</a>, <a href="/supplier/delete/{{x[0]}}" onclick="return confirm('Are you sure you want to delete this route?');">Delete</a>
                             </td>
                         </tr>
                         {% endfor %}

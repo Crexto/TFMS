@@ -21,7 +21,24 @@ def route():
         return render_template("route.html",type=view_type)
 
 
-@route_bp.route("/route/<int:id>", methods=['POST','GET'])
+@route_bp.route("/route/delete/<int:id>")
+def Rdelete(id):
+
+    curr = conn.cursor()
+    curr.execute("SELECT active FROM blg_routemaster WHERE id = %s",(id,))
+    data = curr.fetchone()[0]
+
+    if data == True:
+        curr.execute("UPDATE blg_routemaster SET active = %s WHERE id = %s",(False,id))
+        flash("Route is successfully Deleted", "success")
+    else:
+        flash("Route is already Deleted", "danger")
+    curr.close()
+
+    return redirect(url_for("route.route",type="manage"))
+
+
+@route_bp.route("/route/edit/<int:id>", methods=['POST','GET'])
 def routeEdit(id):
     curr = conn.cursor()
     if request.method == "GET":

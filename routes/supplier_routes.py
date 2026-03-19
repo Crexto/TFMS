@@ -20,7 +20,23 @@ def supplier():
         return render_template("supp.html", type=view_type)
 
 
-@supplier_bp.route("/supplier/<int:id>", methods=['GET','POST'])
+@supplier_bp.route("/supplier/delete/<int:id>")
+def delete(id):
+
+    curr = conn.cursor()
+    curr.execute("SELECT is_active FROM bl_sup_register WHERE id = %s",(id,))
+    data = curr.fetchone()[0]
+
+    if data == True:
+        curr.execute("UPDATE bl_sup_register SET is_active = %s WHERE id = %s",(False,id))
+        flash("Supplier is successfully Deleted", "success")
+    else:
+        flash("Supplier is already Deleted", "danger")
+    curr.close()
+    return redirect(url_for("supplier.supplier",type="manage"))
+
+
+@supplier_bp.route("/supplier/edit/<int:id>", methods=['GET','POST'])
 def supplierEdit(id):
     if request.method == "GET":
         curr = conn.cursor()
