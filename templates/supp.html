@@ -140,10 +140,10 @@
     
 
         {% if type == 'manage' %}
-
-            <div id="manage-form" class="card">
-                <h2>Supplier Registry</h2>
-                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <div id="manage-form" class="card">
+            <h2>Supplier Registry</h2>
+                <input type="text" id="searchInput" placeholder="Search suppliers" style="width: 100%; padding: 10px; margin-top: 15px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;" id="supplierTable">
                     <thead>
                         <tr style="background-color: #f2f2f2; text-align: left;">
                             <th style="padding: 10px;">ID</th>
@@ -168,6 +168,17 @@
                     </tbody>
                 </table>
             </div>
+            <script>
+            document.getElementById("searchInput").addEventListener("keyup", function () {
+                let filter = this.value.toLowerCase();
+                let rows = document.querySelectorAll("#supplierTable tbody tr");
+
+                rows.forEach(row => {
+                    let text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(filter) ? "" : "none";
+                });
+            });
+            </script>
         {% elif type == 'add' %}
 
             <div id="add-form" class="card">
@@ -200,8 +211,12 @@
                     <input name="product_id" type="number"><br><br>
 
                     <label>Route ID: </label>
-                    <input name="route_id" type="number" required><br><br>
-
+                    <select name="route_id" form="SupF" required>
+                        {% for x in supp %}
+                        <option value="{{ x[0] }}">{{ x[0] }}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    
                     <label>Branch ID: </label>
                     <input name="branch_id" type="number" value="0"><br><br>
 

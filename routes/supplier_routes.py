@@ -15,7 +15,11 @@ def supplier():
         curr.close()
         return render_template("supp.html", supp=data, type=view_type)
     elif view_type == "add":
-        return render_template("supp.html", type=view_type)
+        curr = conn.cursor()
+        curr.execute("SELECT id FROM blg_routemaster")
+        data = curr.fetchall()
+        curr.close()
+        return render_template("supp.html", supp=data ,type=view_type)
     else:
         return render_template("supp.html", type=view_type)
 
