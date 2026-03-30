@@ -163,7 +163,11 @@
             <input name="product_id" type="number" value="{{a[3]}}"><br><br>
 
             <label>Route ID: </label>
-            <input name="route_id" type="number" value="{{a[5]}}" required><br><br>
+            <select name="route_id" form="SupF" required>
+                {% for x in supp %}
+                <option value="{{ x[0] }}" {{ 'selected' if x[0] == a[5] }}>{{ x[0] }}</option>
+                {% endfor %}
+            </select><br><br>
 
             <label>Branch ID: </label>
             <input name="branch_id" type="number" value="{{a[16]}}"><br><br>

@@ -101,8 +101,10 @@ SELECT created_by,
         curr.execute(sql,(id,))
         a = curr.fetchone()
         a = ["" if x is None else x for x in a]
+        curr.execute("SELECT id FROM blg_routemaster")
+        data = curr.fetchall()
         curr.close()
-        return render_template("suppedit.html",id=id,a=a)
+        return render_template("suppedit.html", id=id, a=a, supp=data)
     
     if request.method == "POST":
         curr = conn.cursor()
@@ -161,6 +163,7 @@ UPDATE bl_sup_register SET
 WHERE id=%(id)s
 """
         data = request.form.to_dict()
+        print(data)
 
         for x in data.keys():
             if data[x].strip() == "":

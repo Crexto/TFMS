@@ -140,8 +140,12 @@
 
             <div id="manage-form" class="card">
                 <h2>Route Master</h2>
-                <input type="text" id="searchInput" placeholder="Search routes" 
-       style="width: 100%; padding: 10px; margin-top: 15px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc;">
+                <input type="text" id="searchInput" placeholder="Search routes" style="width: 100%; padding: 10px; margin-top: 15px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc;">
+                <select id="statusFilter" onchange="filterSuppliers()">
+                    <option value="all">All Statuses</option>
+                    <option value="true">Active Only</option>
+                    <option value="false">Inactive Only</option>
+                </select>
                 <table style="width: 100%; border-collapse: collapse; margin-top: 20px;" id="routeTable">
                     <thead>
                         <tr style="background-color: #f2f2f2; text-align: left;">
@@ -154,7 +158,7 @@
                     </thead>
                     <tbody>
                         {% for x in data %}
-                        <tr style="border-bottom: 1px solid #ddd;">
+                        <tr style="border-bottom: 1px solid #ddd;" data-active="{{ x[3]|lower }}">
                             <td style="padding: 10px;">#{{x[0]}}</td>
                             <td>{{x[1]}}</td>
                             <td>{{x[2]}}</td>
@@ -168,15 +172,28 @@
                 </table>
             </div>
             <script>
-            document.getElementById("searchInput").addEventListener("keyup", function () {
-                let filter = this.value.toLowerCase();
-                let rows = document.querySelectorAll("#routeTable tbody tr");
+            function applyFilters() {
+                const searchFilter = document.getElementById("searchInput").value.toLowerCase();
+                const statusFilter = document.getElementById("statusFilter").value;
+                const rows = document.querySelectorAll("#routeTable tbody tr");
 
                 rows.forEach(row => {
-                    let text = row.innerText.toLowerCase();
-                    row.style.display = text.includes(filter) ? "" : "none";
+                    const rowText = row.innerText.toLowerCase();
+                    const rowStatus = row.getAttribute("data-active");
+                    
+                    const matchesSearch = rowText.includes(searchFilter);
+                    const matchesStatus = (statusFilter === "all" || rowStatus === statusFilter);
+
+                    if (matchesSearch && matchesStatus) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
                 });
-            });
+            }
+
+            document.getElementById("searchInput").addEventListener("keyup", applyFilters);
+            document.getElementById("statusFilter").addEventListener("change", applyFilters);
             </script>
 
         {% elif type == 'add' %}
