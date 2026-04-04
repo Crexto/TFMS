@@ -106,6 +106,26 @@ WHERE id = %(id)s;"""
         data["active"] = bool(request.form.get('active'))
         data["id"] = id
 
+        check_sql = """
+        SELECT id, route_name, route_code 
+        FROM blg_routemaster 
+        WHERE route_name = %s OR route_code = %s
+        """
+
+        curr.execute(check_sql, (data["RouteName"], data["RouteCode"]))
+        duplicate = curr.fetchall()
+
+        for x in duplicate:
+            if not(x[0] == id):
+                if duplicate[1] == data["RouteName"]:
+                    flash("Error: This Route Name is already in use.", "danger")
+                    curr.close()
+                else:
+                    flash("Error: This Route Code is already assigned to another route.", "danger")
+                    curr.close()
+                
+                return redirect(url_for("route.route", type="manage"))
+
         try:
             
             curr.execute(sql, data)
@@ -183,8 +203,24 @@ VALUES (
     data["UpdatedDate"] = datetime.date.today()
     data["active"] = bool(request.form.get('active'))
 
+    check_sql = """
+        SELECT route_name, route_code 
+        FROM blg_routemaster 
+        WHERE route_name = %s OR route_code = %s
+    """
+    curr.execute(check_sql, (data["RouteName"], data["RouteCode"]))
+    duplicate = curr.fetchone()
+
+    if duplicate:
+        if duplicate[0] == data["RouteName"]:
+            flash("Error: This Route Name is already in use.", "danger")
+            curr.close()
+        else:
+            flash("Error: This Route Code is already assigned to another route.", "danger")
+            curr.close()
+        return redirect(url_for("route.route", type="add"))
+
     try:
-        
         curr.execute(sql, data)
         conn.commit()
         flash("Route added successfully!", "success")

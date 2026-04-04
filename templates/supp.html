@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <title>TFMS - Master</title>
     <style>
         :root {
@@ -228,12 +232,21 @@
                     <label>Product ID: </label>
                     <input name="product_id" type="number"><br><br>
 
-                    <label>Route ID: </label>
-                    <select name="route_id" form="SupF" required>
-                        {% for x in supp %}
-                        <option value="{{ x[0] }}">{{ x[0] }}</option>
-                        {% endfor %}
+                    <label for="route_select">Route Name: </label>
+                    <select name="route_id" id="route_select" class="form-control" form="SupF" required>
+                        <option value=""> Search and Select a Route </option>
+                            {% for x in supp %}
+                            <option value="{{ x[0] }}">{{ x[1] }}</option>
+                            {% endfor %}
                     </select><br><br>
+
+                    <script>$(document).ready(function() {
+                        $('#route_select').select2({
+                            placeholder: "Type to search routes...",
+                            allowClear: true,
+                        });
+                    });
+                    </script>
                     
                     <label>Branch ID: </label>
                     <input name="branch_id" type="number" value="0"><br><br>

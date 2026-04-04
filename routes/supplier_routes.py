@@ -16,7 +16,7 @@ def supplier():
         return render_template("supp.html", supp=data, type=view_type)
     elif view_type == "add":
         curr = conn.cursor()
-        curr.execute("SELECT id FROM blg_routemaster")
+        curr.execute("SELECT id, route_name FROM blg_routemaster")
         data = curr.fetchall()
         curr.close()
         return render_template("supp.html", supp=data ,type=view_type)
@@ -101,7 +101,7 @@ SELECT created_by,
         curr.execute(sql,(id,))
         a = curr.fetchone()
         a = ["" if x is None else x for x in a]
-        curr.execute("SELECT id FROM blg_routemaster")
+        curr.execute("SELECT id, route_name FROM blg_routemaster")
         data = curr.fetchall()
         curr.close()
         return render_template("suppedit.html", id=id, a=a, supp=data)
@@ -163,7 +163,6 @@ UPDATE bl_sup_register SET
 WHERE id=%(id)s
 """
         data = request.form.to_dict()
-        print(data)
 
         for x in data.keys():
             if data[x].strip() == "":
@@ -186,6 +185,38 @@ WHERE id=%(id)s
         data["other_scheme_registered"] = bool(request.form.get('other_scheme_registered'))
         data["collector"] = bool(request.form.get('collector'))
         data["id"] = id
+
+        check_sql = """
+            SELECT id, reg_no, reg_name, nic_no, bank_account_name, bank_account
+            FROM public.bl_sup_register 
+            WHERE (reg_no IS NOT NULL AND reg_no = %s)
+            OR (LOWER(reg_name) = LOWER(%s))
+            OR (nic_no IS NOT NULL AND nic_no = %s)
+            OR (bank_account_name IS NOT NULL AND bank_account = %s)
+            OR (bank_account IS NOT NULL AND bank_account = %s)
+            """
+
+        vals = (
+            data["reg_no"],
+            data["reg_name"],
+            data["nic_no"],
+            data["bank_account_name"],
+            data["bank_account"]
+        )
+    
+        curr.execute(check_sql, vals)
+        duplicate = curr.fetchall()
+
+        for x in duplicate:
+            if not(x[0] == id):
+                labels = ["Registration No", "Registration Name", "NIC No", "Bank Account Name", "Bank Account"]
+                
+                for i, val in enumerate(x[1::]):
+                    if val and str(val).strip() == str(vals[i]).strip():
+                        flash(f"Error: The {labels[i]} '{val}' is already registered.", "danger")
+                        curr.close()
+                        break
+                return redirect(url_for("supplier.supplier" ,type="manage"))
 
         try:
             
@@ -337,6 +368,38 @@ VALUES (
     data["saving_scheme_registered"] = bool(request.form.get('saving_scheme_registered'))
     data["other_scheme_registered"] = bool(request.form.get('other_scheme_registered'))
     data["collector"] = bool(request.form.get('collector'))
+
+    check_sql = """
+        SELECT reg_no, reg_name, nic_no, bank_account_name, bank_account
+        FROM public.bl_sup_register 
+        WHERE (reg_no IS NOT NULL AND reg_no = %s)
+        OR (LOWER(reg_name) = LOWER(%s))
+        OR (nic_no IS NOT NULL AND nic_no = %s)
+        OR (bank_account_name IS NOT NULL AND bank_account = %s)
+        OR (bank_account IS NOT NULL AND bank_account = %s)
+        """
+
+    vals = (
+        data["reg_no"],
+        data["reg_name"],
+        data["nic_no"],
+        data["bank_account_name"],
+        data["bank_account"]
+    )
+  
+    curr.execute(check_sql, vals)
+    duplicate = curr.fetchone()
+
+    if duplicate:
+        labels = ["Registration No", "Registration Name", "NIC No", "Bank Account Name", "Bank Account"]
+        
+        for i, val in enumerate(duplicate):
+            if val and str(val).strip() == str(vals[i]).strip():
+                flash(f"Error: The {labels[i]} '{val}' is already registered.", "danger")
+                curr.close()
+                break
+        
+        return redirect(url_for("supplier.supplier" ,type="add"))
 
     try:
         
